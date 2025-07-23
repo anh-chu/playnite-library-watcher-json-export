@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup .NET Framework
+    - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
     
     - name: Setup NuGet
@@ -25,7 +25,7 @@ jobs:
       run: nuget restore LibraryWatcher.sln
     
     - name: Build solution
-      run: MSBuild.exe LibraryWatcher.csproj /p:Configuration=Release /p:Platform="Any CPU"
+      run: MSBuild.exe LibraryWatcher.csproj /p:Configuration=Release /p:Platform=AnyCPU
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -41,7 +41,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup .NET Framework
+    - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
     
     - name: Setup NuGet
@@ -51,7 +51,7 @@ jobs:
       run: nuget restore LibraryWatcher.sln
     
     - name: Build solution
-      run: MSBuild.exe LibraryWatcher.csproj /p:Configuration=Release /p:Platform="Any CPU"
+      run: MSBuild.exe LibraryWatcher.csproj /p:Configuration=Release /p:Platform=AnyCPU
       
     - name: Create zip package
       run: |
