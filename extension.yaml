@@ -1,0 +1,7 @@
+﻿Id: LibraryWatcher_2ad54430-40aa-4230-b0be-1e1d00322f16
+Name: Raycast Library Watcher
+Author: Anh Chu
+Version: 0.1
+Module: LibraryWatcher.dll
+Type: GenericPlugin
+Icon: icon.png

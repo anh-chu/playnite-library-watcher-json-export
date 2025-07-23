@@ -1,0 +1,28 @@
+# Build results
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+
+# Visual Studio
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+packages/
+*.nupkg
+
+# Playnite
+*.pext
+
+# System files
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
