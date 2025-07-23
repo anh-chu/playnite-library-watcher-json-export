@@ -1,0 +1,89 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ created ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET Framework
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v2
+      
+    - name: Restore NuGet packages
+      run: nuget restore LibraryWatcher.sln
+    
+    - name: Build solution
+      run: MSBuild.exe LibraryWatcher.csproj /p:Configuration=Release /p:Platform="Any CPU"
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: LibraryWatcher-build
+        path: bin/Release/
+        
+  release:
+    needs: build
+    runs-on: windows-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET Framework
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v2
+      
+    - name: Restore NuGet packages
+      run: nuget restore LibraryWatcher.sln
+    
+    - name: Build solution
+      run: MSBuild.exe LibraryWatcher.csproj /p:Configuration=Release /p:Platform="Any CPU"
+      
+    - name: Create zip package
+      run: |
+        $date = Get-Date -Format "yyyy-MM-dd-HHmm"
+        $version = "v1.0.0-$date"
+        Compress-Archive -Path "bin/Release/*" -DestinationPath "LibraryWatcher-$version.zip"
+        echo "RELEASE_VERSION=$version" >> $env:GITHUB_ENV
+        echo "ZIP_FILE=LibraryWatcher-$version.zip" >> $env:GITHUB_ENV
+    
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.RELEASE_VERSION }}
+        release_name: LibraryWatcher ${{ env.RELEASE_VERSION }}
+        body: |
+          Automated release of LibraryWatcher Playnite extension
+          
+          ## Installation
+          1. Download the zip file below
+          2. Extract to your Playnite extensions directory
+          3. Restart Playnite
+        draft: false
+        prerelease: false
+        
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.ZIP_FILE }}
+        asset_name: ${{ env.ZIP_FILE }}
+        asset_content_type: application/zip
